@@ -1,6 +1,8 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 const { up } = require("inquirer/lib/utils/readline");
+const { type } = require("os");
+const { restoreDefaultPrompts } = require("inquirer");
 
 const connection = mysql.createConnection({
   host: "localhost",
@@ -37,7 +39,7 @@ function askQuestions() {
         choices: [
           "Add department",
           "Add roles",
-          "Add employess",
+          "Add employees",
           "View Department",
           "View roles",
           "View Employees",
@@ -72,9 +74,9 @@ function askQuestions() {
             createNewRole(res2);
           });
       }
-      if (res.type === "Add employee") {
+      if (res.type === "Add employees") {
         connection.query(
-          "SELECT first_name, last_name, title, salary, manager_id FROM employee LEFT JOIN role ON role.id = employee.role_id LEFT JOIN department ON department.id = role.department_id;",
+          "SELECT role_id, manager_id FROM employee LEFT JOIN role ON role.id = employee.role_id LEFT JOIN department ON department.id = role.department_id;",
           function (err, results) {
             inquirer
               .prompt([
@@ -91,14 +93,14 @@ function askQuestions() {
                 {
                   type: "list",
                   name: "role",
-                  message: "What is the employees role?",
+                  message: "What is the employees  role id?",
                   choices: function () {
-                    return results.map((employee) => employee.title);
+                    return results.map((employee) => employee.role_id);
                   },
                 },
                 {
                   type: "list",
-                  name: "last",
+                  name: "manager",
                   message: "Who is the Employess Manager?",
                   choices: function () {
                     return results.map((employee) => employee.manager_id);
@@ -111,5 +113,69 @@ function askQuestions() {
           }
         );
       }
+      if (type === "View Department") {
+        connection.query("SELECT name FROM department;", function (err, data) {
+          if (err) throw err;
+          console.table(data);
+          render();
+        });
+      }
+      if (type === "View Roles") {
+        connection.query(
+          "SELECT title, salary, name FROM role LEFT JOIN department ON department.id = role.department_id;",
+          function (err, data) {
+            if (err) throw err;
+            console.table(data);
+            render();
+          }
+        );
+      }
+      if (type === "View Employees") {
+        connection.query(
+          "SELECT first_name, last_name, title, name FROM employee LEFT JOIN ON role.id = employee.role_id LEFT JOIN department ON department.id = role.department_id;",
+          function (err, data) {
+            if (err) throw err;
+            console.table(data);
+            render();
+          }
+        );
+      }
     });
+}
+
+function createNewDepart(data) {
+  connection.query(
+    "INSERT INTO department SET ?",
+    [data.depart],
+    function (err, res) {
+      if (err) throw err;
+      console.log("Updated departments.");
+      render();
+    }
+  );
+}
+
+function createNewRole(data) {
+  connection.query("INSERT INTO role SET ?", [data.role], function (err, res) {
+    if (err) throw err;
+    console.log("Updated roles.");
+    render();
+  });
+}
+
+function createNewEmply(data) {
+  connection.query(
+    "INSERT INTO employee SET ?",
+    {
+      first_name: data.first,
+      last_name: data.last,
+      role_id: data.role,
+      manager_id: data.manager,
+    },
+    function (err, res) {
+      if (err) throw err;
+      console.log("Updated departments.");
+      render();
+    }
+  );
 }
