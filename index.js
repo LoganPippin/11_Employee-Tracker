@@ -41,9 +41,10 @@ function askQuestions() {
           "Add roles",
           "Add employees",
           "View Department",
-          "View roles",
+          "View Roles",
           "View Employees",
           "Update Employee roles",
+          "Exit",
         ],
       },
     ])
@@ -113,32 +114,65 @@ function askQuestions() {
           }
         );
       }
-      if (type === "View Department") {
+      if (res.type === "View Department") {
         connection.query("SELECT name FROM department;", function (err, data) {
           if (err) throw err;
           console.table(data);
-          render();
+          askQuestions();
         });
       }
-      if (type === "View Roles") {
+      if (res.type === "View Roles") {
         connection.query(
           "SELECT title, salary, name FROM role LEFT JOIN department ON department.id = role.department_id;",
           function (err, data) {
             if (err) throw err;
             console.table(data);
-            render();
+            askQuestions();
           }
         );
       }
-      if (type === "View Employees") {
+      if (res.type === "View Employees") {
         connection.query(
-          "SELECT first_name, last_name, title, name FROM employee LEFT JOIN ON role.id = employee.role_id LEFT JOIN department ON department.id = role.department_id;",
+          "SELECT first_name, last_name, title, name FROM employee LEFT JOIN role ON role.id = employee.role_id LEFT JOIN department ON department.id = role.department_id;",
           function (err, data) {
             if (err) throw err;
             console.table(data);
-            render();
+            askQuestions();
           }
         );
+      }
+      if (res.type === "Update Employee roles") {
+        connection.query(
+          "SELECT first_name, last_name, role_id, salary, manager_id FROM employee LEFT JOIN role ON role.id = employee.role_id LEFT JOIN department ON department.id = role.department_id;",
+          function (err, data) {
+            if (err) throw err;
+            inquirer
+              .prompt([
+                {
+                  type: "list",
+                  message: "What Employee needs updated",
+                  choices: function () {
+                    return data.map((role) => role.first_name);
+                  },
+                  name: "name",
+                },
+                {
+                  type: "list",
+                  message: "What is the new role?",
+                  choices: function () {
+                    return data.map((role) => role.role_id);
+                  },
+                  name: "role",
+                },
+              ])
+              .then((res2) => {
+                updateEmply(res2);
+              });
+          }
+        );
+      }
+      if (res.type === "Exit") {
+        connection.end();
       }
     });
 }
@@ -175,6 +209,24 @@ function createNewEmply(data) {
     function (err, res) {
       if (err) throw err;
       console.log("Updated departments.");
+      render();
+    }
+  );
+}
+
+function updateEmply(res2) {
+  connection.query(
+    "UPDATE employee SET ? WHERE ?",
+    [
+      {
+        role_id: res2.role,
+      },
+      {
+        first_name: res2.name,
+      },
+    ],
+    function (err, data) {
+      if (err) throw err;
       render();
     }
   );
