@@ -1,0 +1,25 @@
+{
+  "name": "11_Employee-Tracker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LoganPippin/11_Employee-Tracker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "inquirer": "7.3.3",
+    "mysql": "2.18.1",
+    "console-table": "0.1.2"
+  },
+  "bugs": {
+    "url": "https://github.com/LoganPippin/11_Employee-Tracker/issues"
+  },
+  "homepage": "https://github.com/LoganPippin/11_Employee-Tracker#readme"
+}
