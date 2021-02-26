@@ -14,6 +14,28 @@
 
 It is a console application that allows a user to view employee, epartment and roles it also allows you to update the employees, and add departments, roles, and employess.
 
+## Screenshots
+
+-start up
+
+![Start Up](./assets/StartUp.png)
+
+-Add Department
+
+![Add Department](./assets/AddDepart.png)
+
+-Add Role
+
+![Start Up](./assets/AddRole.png)
+
+-Add Employee
+
+![Add Department](./assets/AddEmployee.png)
+
+-Views
+
+![Add Department](./assets/Views.png)
+
 ## Installation
 
 you need to install mysql,inquirer, and consoletable. You also need to set up the mysql database with the given schema and seeds (seeds optional).
